@@ -24,7 +24,14 @@ model Users {
 }
 
 model Favorite {
-  id      String @id
-  details Json
-  notes   String
+  id     String @id
+  title  String
+  poster String
+  type   MediaType
+  year   String
+}
+
+enum MediaType {
+  movie
+  tv_show
 }
