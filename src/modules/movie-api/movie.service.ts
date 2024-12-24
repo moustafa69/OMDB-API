@@ -1,23 +1,19 @@
 import { Injectable, HttpException, HttpStatus } from '@nestjs/common';
+import { ConfigService } from '@nestjs/config';
 import axios, { AxiosResponse } from 'axios';
+import { MovieSearchParamDto } from '../omdb-api/dto/query-param.dto';
 
 @Injectable()
 export class MovieService {
-  constructor() {}
+  constructor(private config: ConfigService) {}
 
-  private readonly apiKey = 'b1b1ea67';
-  private readonly baseUrl = 'https://www.omdbapi.com/';
-
-  async fetchMovieDetails(query: string): Promise<any> {
+  async fetchMovieDetails({ search }: MovieSearchParamDto): Promise<any> {
+    const apiKey = this.config.get('MOVIE_API_KEY');
+    const baseUrl = this.config.get('MOVIE_API_BASE_URL');
     try {
-      const response: AxiosResponse<any> = await axios.get(this.baseUrl, {
-        params: {
-          apikey: this.apiKey,
-          s: query,
-        },
-      });
-
-      // Check if there was an error in the response
+      const response: AxiosResponse<any> = await axios.get(
+        `${baseUrl}${apiKey}&s=${search}`,
+      );
       if (response.data.Response === 'False') {
         throw new HttpException(response.data.Error, HttpStatus.NOT_FOUND);
       }
